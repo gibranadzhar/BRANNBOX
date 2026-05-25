@@ -15,7 +15,7 @@
             </h1>
             <p id="auth-title" class="text-gray-300 font-semibold mt-3 text-sm uppercase tracking-wide">Masuk ke Galeri</p>
             <p class="text-gray-400 text-xs mt-2 px-4 leading-relaxed">
-                Memudahkan Anda untuk menyimpan foto dan video, privasi terjaga.
+                Memounding Anda untuk menyimpan foto dan video, privasi terjaga.
             </p>
         </div>
         
@@ -93,7 +93,7 @@
         </div>
 
         <div class="mt-4 text-center space-y-2">
-            <p id="modal-filename" class="text-sm text-gray-400 truncate max-w-md"></p>
+            <p id="modal-filename" class="text-sm text-gray-400 truncate max-w-md mx-auto"></p>
             <button id="modal-download-btn" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl text-sm font-semibold transition">
                 ⬇ Download File Ini
             </button>
@@ -177,6 +177,8 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
+            if (!email || !password) return alert('Email dan Password harus diisi!');
+
             const storedData = localStorage.getItem('user_' + email);
             if (!storedData) return alert('Akun tidak ditemukan. Silakan daftar dulu!');
 
@@ -193,6 +195,8 @@
         function handleResetPassword() {
             const email = document.getElementById('email').value.trim();
             const answer = document.getElementById('security-answer').value.trim().toLowerCase();
+
+            if (!email || !answer) return alert('Email dan jawaban pemulihan wajib diisi!');
 
             const storedData = localStorage.getItem('user_' + email);
             if (!storedData) return alert('Email tidak terdaftar!');
@@ -283,8 +287,12 @@
             tampilkanMedia(); 
         }
 
-        // AKSI SAAT MEDIA DIKLIK (SELEKSI ATAU BUKA PLAYER)
-        function handleMediaClick(index, name, dataUrl, type) {
+        // PERBAIKAN: Parameter string dibungkus dengan aman agar tidak merusak HTML onClick
+        function handleMediaClick(index) {
+            const storageKey = 'gallery_' + currentActiveUser;
+            const userGallery = JSON.parse(localStorage.getItem(storageKey)) || [];
+            const item = userGallery[index];
+
             if (isSelectMode) {
                 const idx = selectedIndexes.indexOf(index);
                 if (idx > -1) {
@@ -295,12 +303,10 @@
                 updateDownloadButtonText();
                 tampilkanMedia();
             } else {
-                // UPDATE: Sekarang membuka Pop-Up Player khusus, bukan konfirmasi kaku
-                openMediaModal(name, dataUrl, type);
+                openMediaModal(item.name, item.data, item.type);
             }
         }
 
-        // === FITUR BARU: PANEL POP-UP UTK BUKA FOTO & PUTAR VIDEO ===
         function openMediaModal(name, dataUrl, type) {
             const modal = document.getElementById('media-modal');
             const modalImg = document.getElementById('modal-img');
@@ -308,14 +314,14 @@
             const modalFilename = document.getElementById('modal-filename');
             const modalDownloadBtn = document.getElementById('modal-download-btn');
 
-            modalFilename.innerText = name;
+            modalFilename.innerText = name || "unnamed_file";
             modalDownloadBtn.onclick = function() { pemicuDownload(dataUrl, name); };
 
-            if(type.startsWith('video/')) {
+            if(type && type.startsWith('video/')) {
                 modalImg.classList.add('hidden');
                 modalVideo.classList.remove('hidden');
                 modalVideo.src = dataUrl;
-                modalVideo.play(); // Auto-play video saat dibuka
+                modalVideo.play(); 
             } else {
                 modalVideo.classList.add('hidden');
                 modalImg.classList.remove('hidden');
@@ -328,7 +334,7 @@
             const modal = document.getElementById('media-modal');
             const modalVideo = document.getElementById('modal-video');
             
-            modalVideo.pause(); // Hentikan video saat pop-up ditutup
+            modalVideo.pause(); 
             modalVideo.src = ""; 
             modal.classList.add('hidden');
         }
@@ -347,7 +353,7 @@
         }
 
         function downloadSelectedFiles() {
-            if (selectedIndexes.length === 0) return alert('Pilih minimal 1 file bray!');
+            if (selectedIndexes.length === 0) return alert('Pilih minimal 1 file!');
 
             const storageKey = 'gallery_' + currentActiveUser;
             const userGallery = JSON.parse(localStorage.getItem(storageKey)) || [];
@@ -359,7 +365,7 @@
                 
                 setTimeout(() => {
                     pemicuDownload(item.data, fixName);
-                }, i * 150); // Jeda aman antar-unduhan berkala
+                }, i * 150); 
             });
 
             toggleSelectMode(); 
@@ -379,10 +385,11 @@
 
             userGallery.forEach((item, index) => {
                 const isChecked = selectedIndexes.includes(index);
-                const isVideo = item.type.startsWith('video/');
+                const isVideo = item.type && item.type.startsWith('video/');
                 
+                // Cukup lempar index saja ke fungsi click agar string data aman dari crash tanda kutip
                 let htmlCard = `
-                    <div onclick="handleMediaClick(${index}, '${item.name || 'file'}', '${item.data}', '${item.type}')" 
+                    <div onclick="handleMediaClick(${index})" 
                          class="relative cursor-pointer group rounded-xl overflow-hidden border ${isChecked ? 'border-blue-500 ring-4 ring-blue-500/30' : 'border-gray-800 hover:border-gray-600'} transition bg-black h-48">
                 `;
 
@@ -399,6 +406,4 @@
 
                 if (!isSelectMode) {
                     htmlCard += `
-                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                            <span class="bg-gray-900/90 text-xs px-3 py-1.5 rounded-lg border border-gray-700 font-medium tracking-wide">
-                              
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:op
