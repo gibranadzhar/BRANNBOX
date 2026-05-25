@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRANNBOX - Ultra Fast Storage</title>
+    <title>BRANNBOX - Permanent Vault</title>
     <style>
         body { 
             background: radial-gradient(circle at top, #1e1b4b 0%, #090514 100%); 
@@ -32,7 +32,6 @@
             border-radius: 10px; 
             font-size: 14px; 
             box-sizing: border-box; 
-            transition: all 0.3s;
         }
         input:focus { border-color: #3b82f6; background: rgba(255, 255, 255, 0.08); outline: none; }
         label { display: block; text-align: left; font-size: 11px; color: #a5b4fc; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; }
@@ -83,15 +82,15 @@
         .modal { display: none; position: fixed; inset: 0; background-color: rgba(5, 3, 13, 0.96); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .modal-content { max-width: 100%; max-height: 70vh; border-radius: 12px; }
         .btn-close { position: absolute; top: 20px; right: 20px; background-color: #1e293b; color: white; padding: 10px 22px; border-radius: 20px; }
+        .btn-delete-card { position: absolute; top: 12px; right: 12px; background: rgba(239, 68, 68, 0.8); color: white; border: none; padding: 4px 8px; border-radius: 6px; font-size: 11px; z-index: 5; }
     </style>
 </head>
 <body>
 
-    <!-- 1. HALAMAN AUTENTIKASI -->
     <div id="auth-section" class="auth-box">
         <h1>BRANNBOX</h1>
         <p id="auth-title">Masuk ke Galeri</p>
-        <p class="slogan">Simpan video & foto ukuran besar tanpa hambatan lag.</p>
+        <p class="slogan">Penyimpanan video & foto permanen aman dan anti-hilang.</p>
         
         <div>
             <div class="input-group">
@@ -127,7 +126,6 @@
         </div>
     </div>
 
-    <!-- 2. DASHBOARD -->
     <div id="dashboard-section" class="dashboard hidden">
         <div class="header">
             <span class="logo-text">BRANNBOX</span>
@@ -136,10 +134,10 @@
         </div>
 
         <div class="upload-zone">
-            <p style="margin: 0 0 18px 0; color:#e2e8f0;">Masukkan video/foto resolusi tinggi sekalipun:</p>
+            <p style="margin: 0 0 18px 0; color:#e2e8f0;">Unggah File (Tersimpan Permanen di Browser Anda):</p>
             <input type="file" id="file-chooser" accept="image/*,video/*" multiple class="hidden" onchange="previewFileName()">
             <label for="file-chooser" class="btn-choose">+ Pilih File</label>
-            <button type="button" onclick="uploadMultipleFiles()" class="btn-emerald" style="margin-left: 8px;">Simpan</button>
+            <button type="button" onclick="uploadMultipleFiles()" class="btn-emerald" style="margin-left: 8px;">Simpan Permanen</button>
             <p id="file-name-preview" style="color:#fbbf24; font-size:13px; margin-top:12px;"></p>
         </div>
 
@@ -154,7 +152,6 @@
         <div id="gallery" class="grid-gallery"></div>
     </div>
 
-    <!-- 3. MODAL DISPLAY -->
     <div id="media-modal" class="modal">
         <button type="button" onclick="closeMediaModal()" class="btn-close">✕ Tutup</button>
         <div style="width:100%; max-width:720px; display:flex; justify-content:center;">
@@ -165,14 +162,34 @@
     </div>
 
     <script>
-        let localUserDatabase = {}; 
-        let memoryGallery = []; // Menyimpan objek FILE asli (Ultra Ringan)
+        // INISIALISASI INDEXEDDB (Database Permanen Browser)
+        let db;
+        const request = indexedDB.open("BrannBoxDatabase", 2);
+
+        request.onupgradeneeded = function(e) {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("users")) {
+                db.createObjectStore("users", { keyPath: "email" });
+            }
+            if (!db.objectStoreNames.contains("gallery")) {
+                db.createObjectStore("gallery", { keyPath: "id", autoIncrement: true });
+            }
+        };
+
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            // CEK SESSION LOGIN AKTIF (Auto-Login pas di-refresh)
+            const savedSession = localStorage.getItem("brannbox_session");
+            if (savedSession) {
+                currentActiveUser = savedSession;
+                jalankanDashboard();
+            }
+        };
+
+        let memoryGallery = []; 
         let currentActiveUser = null;
         let isSelectMode = false;
         let selectedIndexes = [];
-
-        // Deteksi Otomatis Akun Demo
-        localUserDatabase["test@gmail.com"] = { password: "123", securityAnswer: "kucing" };
 
         function togglePasswordView() {
             const passInput = document.getElementById('password');
@@ -194,38 +211,74 @@
             const password = document.getElementById('password').value;
             const answer = document.getElementById('security-answer').value.trim().toLowerCase();
             if (!email || !password || !answer) return alert('Lengkapi kolom bray!');
-            localUserDatabase[email] = { password: password, securityAnswer: answer };
-            alert('Pendaftaran Sukses!');
-            toggleMode(true);
+
+            const tx = db.transaction("users", "readwrite");
+            const store = tx.objectStore("users");
+            
+            store.put({ email: email, password: password, securityAnswer: answer });
+            tx.oncomplete = function() {
+                alert('Pendaftaran Sukses Perndata Terproteksi!');
+                toggleMode(true);
+            };
         }
 
         function handleLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const user = localUserDatabase[email];
-            if (!user || user.password !== password) return alert('Email atau Password salah!');
-            
-            currentActiveUser = email;
-            document.getElementById('auth-section').classList.add('hidden');
-            document.getElementById('dashboard-section').classList.remove('hidden');
-            document.getElementById('user-email').innerText = email;
-            tampilkanMedia();
+
+            // Akun Bawaan Demo Pertama Kali
+            if (email === "test@gmail.com" && password === "123") {
+                currentActiveUser = email;
+                localStorage.setItem("brannbox_session", email);
+                jalankanDashboard();
+                return;
+            }
+
+            const tx = db.transaction("users", "readonly");
+            const store = tx.objectStore("users");
+            const req = store.get(email);
+
+            req.onsuccess = function() {
+                const user = req.result;
+                if (user && user.password === password) {
+                    currentActiveUser = email;
+                    localStorage.setItem("brannbox_session", email); // Simpan session login
+                    jalankanDashboard();
+                } else {
+                    alert('Email atau Password salah bray!');
+                }
+            };
         }
 
         function handleResetPassword() {
             const email = document.getElementById('email').value.trim();
             const answer = document.getElementById('security-answer').value.trim().toLowerCase();
-            const user = localUserDatabase[email];
-            if (user && user.securityAnswer === answer) {
-                alert(`Password Anda: ${user.password}`);
-                toggleMode(true);
-            } else {
-                alert('Jawaban Pemulihan Salah!');
-            }
+
+            const tx = db.transaction("users", "readonly");
+            const store = tx.objectStore("users");
+            const req = store.get(email);
+
+            req.onsuccess = function() {
+                const user = req.result;
+                if (user && user.securityAnswer === answer) {
+                    alert(`Password Anda: ${user.password}`);
+                    toggleMode(true);
+                } else {
+                    alert('Data pemulihan tidak cocok!');
+                }
+            };
+        }
+
+        function jalankanDashboard() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('user-email').innerText = currentActiveUser;
+            ambilDataMediaDariDB();
         }
 
         function handleLogout() {
-            // Hapus Object URL lama dari memori biar HP tidak berat sebelum logout
+            localStorage.removeItem("brannbox_session"); // Hapus session login
+            // Bersihkan sisa tautan memori
             memoryGallery.forEach(item => URL.revokeObjectURL(item.blobUrl));
             memoryGallery = [];
             currentActiveUser = null;
@@ -242,16 +295,68 @@
             const files = document.getElementById('file-chooser').files;
             if (files.length === 0) return alert('Pilih file dulu!');
 
+            const tx = db.transaction("gallery", "readwrite");
+            const store = tx.objectStore("gallery");
+
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                // Trik Sakti: Membuat link virtual super ringan langsung ke file sistem lokal
-                const virtualUrl = URL.createObjectURL(file);
-                memoryGallery.push({ type: file.type, name: file.name, blobUrl: virtualUrl, fileRef: file });
+                // Simpan FILE BLOB ASLI ke harddisk browser secara utuh
+                store.put({
+                    user: currentActiveUser,
+                    name: file.name,
+                    type: file.type,
+                    fileData: file
+                });
             }
 
-            document.getElementById('file-name-preview').innerText = "Berhasil masuk vault!";
-            document.getElementById('file-chooser').value = "";
-            tampilkanMedia();
+            tx.oncomplete = function() {
+                document.getElementById('file-name-preview').innerText = "Permanen tersimpan di Box!";
+                document.getElementById('file-chooser').value = "";
+                ambilDataMediaDariDB();
+            };
+        }
+
+        function ambilDataMediaDariDB() {
+            // Bersihkan sisa ObjectURL lama biar memory leak tidak terjadi
+            memoryGallery.forEach(item => URL.revokeObjectURL(item.blobUrl));
+            memoryGallery = [];
+
+            const tx = db.transaction("gallery", "readonly");
+            const store = tx.objectStore("gallery");
+            const req = store.openCursor();
+
+            req.onsuccess = function(e) {
+                const cursor = e.target.result;
+                if (cursor) {
+                    if (cursor.value.user === currentActiveUser) {
+                        const fileObj = cursor.value;
+                        // Bangkitkan virtual url dari file data asli di database
+                        const vUrl = URL.createObjectURL(fileObj.fileData);
+                        memoryGallery.push({
+                            id: fileObj.id,
+                            type: fileObj.type,
+                            name: fileObj.name,
+                            blobUrl: vUrl
+                        });
+                    }
+                    cursor.continue();
+                } else {
+                    tampilkanMedia();
+                }
+            };
+        }
+
+        function hapusSingleFile(id, event) {
+            event.stopPropagation(); // Mencegah popup video terbuka pas klik hapus
+            if(!confirm("Hapus file ini secara permanen dari browser?")) return;
+
+            const tx = db.transaction("gallery", "readwrite");
+            const store = tx.objectStore("gallery");
+            store.delete(id);
+
+            tx.oncomplete = function() {
+                ambilDataMediaDariDB();
+            };
         }
 
         function toggleSelectMode() {
@@ -285,52 +390,4 @@
                 } else {
                     document.getElementById('modal-img').src = item.blobUrl;
                 }
-                modal.style.display = 'flex';
-            }
-        }
-
-        function closeMediaModal() {
-            document.getElementById('modal-video').pause();
-            document.getElementById('modal-video').src = "";
-            document.getElementById('media-modal').style.display = 'none';
-        }
-
-        function downloadSelectedFiles() {
-            selectedIndexes.forEach((index, i) => {
-                const item = memoryGallery[index];
-                setTimeout(() => {
-                    const link = document.createElement('a');
-                    link.href = item.blobUrl;
-                    link.download = item.name;
-                    link.click();
-                }, i * 200);
-            });
-            toggleSelectMode();
-        }
-
-        function tampilkanMedia() {
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-
-            if (memoryGallery.length === 0) {
-                gallery.innerHTML = '<p style="grid-column:1/-1; text-align:center; color:#64748b; font-size:14px; padding:40px 0;">Vault kosong bray!</p>';
-                return;
-            }
-
-            memoryGallery.forEach((item, index) => {
-                const isChecked = selectedIndexes.includes(index);
-                const isVideo = item.type && item.type.startsWith('video/');
-                const card = document.createElement('div');
-                card.className = 'media-card' + (isChecked ? ' selected-card' : '');
-                card.onclick = function() { handleCardClick(index); };
-
-                let html = isVideo ? `<video src="${item.blobUrl}"></video><div class="video-badge"><svg style="width:12px; height:12px; fill:#fff;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>` : `<img src="${item.blobUrl}">`;
-                html += !isSelectMode ? `<div class="hover-overlay"><span>${isVideo ? '▶ Putar' : '🔍 Lihat'}</span></div>` : `<div class="check-badge ${isChecked ? 'checked-active' : ''}">${isChecked ? '✓' : ''}</div>`;
-                
-                card.innerHTML = html;
-                gallery.appendChild(card);
-            });
-        }
-    </script>
-</body>
-</html>
+                modal.style.
