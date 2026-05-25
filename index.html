@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galeri Rahasia - Advance Download</title>
+    <title>BRANNBOX - Safe Vault & Player</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body class="bg-gray-950 text-white min-h-screen p-6 font-sans">
 
-    <div id="auth-section" class="max-w-md mx-auto mt-20 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-xl">
-        <h2 id="auth-title" class="text-2xl font-bold mb-6 text-center text-blue-400">MASUK KE GALERI</h2>
+    <div id="auth-section" class="max-w-md mx-auto mt-16 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-xl">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold tracking-wider bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                BRANNBOX
+            </h1>
+            <p id="auth-title" class="text-gray-300 font-semibold mt-3 text-sm uppercase tracking-wide">Masuk ke Galeri</p>
+            <p class="text-gray-400 text-xs mt-2 px-4 leading-relaxed">
+                Memudahkan Anda untuk menyimpan foto dan video, privasi terjaga.
+            </p>
+        </div>
         
         <div class="space-y-4">
-            <input type="email" id="email" placeholder="Email Anda" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none">
-            <input type="password" id="password" placeholder="Password" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none">
+            <input type="email" id="email" placeholder="Email Anda" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none focus:border-blue-500">
+            <input type="password" id="password" placeholder="Password" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none focus:border-blue-500">
             
             <div id="security-box" class="hidden space-y-4">
                 <p class="text-xs text-yellow-400 font-semibold">*Pertanyaan Pemulihan jika Lupa Password:</p>
@@ -40,15 +45,19 @@
 
     <div id="dashboard-section" class="hidden max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-8 bg-gray-900 p-4 rounded-xl border border-gray-800">
-            <div>
-                <p class="text-xs text-gray-400">Akun Aktif:</p>
-                <span id="user-email" class="font-semibold text-blue-400"></span>
+            <div class="flex items-center gap-3">
+                <span class="text-xl font-black tracking-wider text-blue-500">BRANNBOX</span>
+                <div class="w-px h-6 bg-gray-700"></div>
+                <div>
+                    <p class="text-[10px] text-gray-400 uppercase">User</p>
+                    <span id="user-email" class="font-semibold text-gray-200 text-sm"></span>
+                </div>
             </div>
             <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-xl text-sm font-semibold transition">Keluar</button>
         </div>
 
         <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 text-center mb-8">
-            <p class="mb-4 text-gray-300">Pilih satu atau banyak file sekaligus untuk disimpan</p>
+            <p class="mb-4 text-gray-300">Pilih satu atau banyak file sekaligus untuk disimpan aman</p>
             <input type="file" id="file-chooser" accept="image/*,video/*" multiple class="hidden" onchange="previewFileName()">
             <label for="file-chooser" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 px-6 py-3 rounded-xl cursor-pointer font-semibold inline-block">
                 + Pilih File
@@ -73,11 +82,31 @@
             </div>
     </div>
 
+    <div id="media-modal" class="hidden fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-4">
+        <button onclick="closeMediaModal()" class="absolute top-4 right-4 bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-full border border-gray-700 transition">
+            ✕ Tutup
+        </button>
+        
+        <div class="w-full max-w-3xl flex justify-center items-center">
+            <img id="modal-img" class="hidden max-h-[75vh] max-w-full rounded-lg object-contain shadow-2xl" src="">
+            <video id="modal-video" controls class="hidden max-h-[75vh] max-w-full rounded-lg object-contain shadow-2xl bg-black" src=""></video>
+        </div>
+
+        <div class="mt-4 text-center space-y-2">
+            <p id="modal-filename" class="text-sm text-gray-400 truncate max-w-md"></p>
+            <button id="modal-download-btn" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl text-sm font-semibold transition">
+                ⬇ Download File Ini
+            </button>
+        </div>
+    </div>
+
+
     <script>
         let currentActiveUser = null;
         let isSelectMode = false;
         let selectedIndexes = [];
 
+        // Auto Login System
         window.onload = function() {
             const savedSession = localStorage.getItem('session_user');
             if (savedSession) {
@@ -97,7 +126,7 @@
             const passwordInput = document.getElementById('password');
 
             if (mode === true) {
-                title.innerText = "MASUK KE GALERI";
+                title.innerText = "Masuk ke Galeri";
                 securityBox.classList.add('hidden');
                 actionButtons.classList.remove('hidden');
                 btnSubmitSignup.classList.add('hidden');
@@ -106,7 +135,7 @@
                 btnBackLink.classList.add('hidden');
                 passwordInput.classList.remove('hidden');
             } else if (mode === false) {
-                title.innerText = "DAFTAR AKUN BARU";
+                title.innerText = "Daftar Akun Baru";
                 securityBox.classList.remove('hidden');
                 actionButtons.classList.add('hidden');
                 btnSubmitSignup.classList.remove('hidden');
@@ -115,7 +144,7 @@
                 btnBackLink.classList.remove('hidden');
                 passwordInput.classList.remove('hidden');
             } else if (mode === 'forgot') {
-                title.innerText = "PEMULIHAN AKUN";
+                title.innerText = "Pemulihan Akun";
                 securityBox.classList.remove('hidden');
                 actionButtons.classList.add('hidden');
                 btnSubmitSignup.classList.add('hidden');
@@ -134,7 +163,7 @@
             if (!email || !password || !answer) return alert('Semua kolom wajib diisi!');
 
             if (localStorage.getItem('user_' + email)) {
-                return alert('Email ini sudah terdaftar! Silakan login.');
+                return alert('Email ini sudah terdaftar!');
             }
 
             const userData = { password: password, securityAnswer: answer };
@@ -234,7 +263,6 @@
             }
         }
 
-        // === FITUR BARU: AKTIFKAN/MATIKAN MODE PILIH BANYAK ===
         function toggleSelectMode() {
             isSelectMode = !isSelectMode;
             selectedIndexes = [];
@@ -252,13 +280,12 @@
                 btnToggle.classList.replace('bg-red-600', 'bg-gray-800');
                 btnDownload.classList.add('hidden');
             }
-            tampilkanMedia(); // Muat ulang tampilan galeri untuk memunculkan checkbox
+            tampilkanMedia(); 
         }
 
-        // TANGANI AKSI KLIK PADA FOTO/VIDEO
-        function handleMediaClick(index, name, dataUrl) {
+        // AKSI SAAT MEDIA DIKLIK (SELEKSI ATAU BUKA PLAYER)
+        function handleMediaClick(index, name, dataUrl, type) {
             if (isSelectMode) {
-                // Jika mode pilih banyak aktif, gunakan sistem check/uncheck
                 const idx = selectedIndexes.indexOf(index);
                 if (idx > -1) {
                     selectedIndexes.splice(idx, 1);
@@ -268,50 +295,76 @@
                 updateDownloadButtonText();
                 tampilkanMedia();
             } else {
-                // Jika mode biasa, langsung tawarkan opsi download
-                const konfirmasi = confirm(`Apakah Anda ingin mendownload file: "${name}"?`);
-                if (konfirmasi) {
-                    const link = document.createElement('a');
-                    link.href = dataUrl;
-                    link.download = name || 'download-file';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }
+                // UPDATE: Sekarang membuka Pop-Up Player khusus, bukan konfirmasi kaku
+                openMediaModal(name, dataUrl, type);
             }
+        }
+
+        // === FITUR BARU: PANEL POP-UP UTK BUKA FOTO & PUTAR VIDEO ===
+        function openMediaModal(name, dataUrl, type) {
+            const modal = document.getElementById('media-modal');
+            const modalImg = document.getElementById('modal-img');
+            const modalVideo = document.getElementById('modal-video');
+            const modalFilename = document.getElementById('modal-filename');
+            const modalDownloadBtn = document.getElementById('modal-download-btn');
+
+            modalFilename.innerText = name;
+            modalDownloadBtn.onclick = function() { pemicuDownload(dataUrl, name); };
+
+            if(type.startsWith('video/')) {
+                modalImg.classList.add('hidden');
+                modalVideo.classList.remove('hidden');
+                modalVideo.src = dataUrl;
+                modalVideo.play(); // Auto-play video saat dibuka
+            } else {
+                modalVideo.classList.add('hidden');
+                modalImg.classList.remove('hidden');
+                modalImg.src = dataUrl;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeMediaModal() {
+            const modal = document.getElementById('media-modal');
+            const modalVideo = document.getElementById('modal-video');
+            
+            modalVideo.pause(); // Hentikan video saat pop-up ditutup
+            modalVideo.src = ""; 
+            modal.classList.add('hidden');
         }
 
         function updateDownloadButtonText() {
             document.getElementById('btn-download-selected').innerText = `Download Terpilih (${selectedIndexes.length})`;
         }
 
-        // === FITUR BARU: DOWNLOAD BANYAK SEKALIGUS (ZIP) ===
+        function pemicuDownload(url, name) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = name || 'file-download';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         function downloadSelectedFiles() {
             if (selectedIndexes.length === 0) return alert('Pilih minimal 1 file bray!');
 
             const storageKey = 'gallery_' + currentActiveUser;
             const userGallery = JSON.parse(localStorage.getItem(storageKey)) || [];
             
-            const zip = new JSZip();
-
             selectedIndexes.forEach((index, i) => {
                 const item = userGallery[index];
-                const base64Content = item.data.split(',')[1]; // Ambil data murninya saja tanpa header base64
                 const extension = item.type.split('/')[1] || 'jpg';
-                const fileName = item.name || `file_${i + 1}.${extension}`;
+                const fixName = item.name || `file_${i + 1}.${extension}`;
                 
-                zip.file(fileName, base64Content, {base64: true});
+                setTimeout(() => {
+                    pemicuDownload(item.data, fixName);
+                }, i * 150); // Jeda aman antar-unduhan berkala
             });
 
-            alert('Sedang memproses file menjadi ZIP, mohon tunggu sebentar...');
-            
-            zip.generateAsync({type:"blob"}).then(function(content) {
-                saveAs(content, "koleksi_vault_brann.zip");
-                toggleSelectMode(); // Matikan mode pilih banyak setelah download selesai
-            });
+            toggleSelectMode(); 
         }
 
-        // TAMPILKAN MEDIA DENGAN FITUR SELEKSI
         function tampilkanMedia() {
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = '';
@@ -328,41 +381,24 @@
                 const isChecked = selectedIndexes.includes(index);
                 const isVideo = item.type.startsWith('video/');
                 
-                // Pembungkus kartu media
                 let htmlCard = `
-                    <div onclick="handleMediaClick(${index}, '${item.name || 'file'}', '${item.data}')" 
+                    <div onclick="handleMediaClick(${index}, '${item.name || 'file'}', '${item.data}', '${item.type}')" 
                          class="relative cursor-pointer group rounded-xl overflow-hidden border ${isChecked ? 'border-blue-500 ring-4 ring-blue-500/30' : 'border-gray-800 hover:border-gray-600'} transition bg-black h-48">
                 `;
 
-                // Komponen Media
                 if (isVideo) {
-                    htmlCard += `<video src="${item.data}" class="w-full h-full object-cover pointer-events-none"></video>`;
+                    htmlCard += `
+                        <video src="${item.data}" class="w-full h-full object-cover pointer-events-none"></video>
+                        <div class="absolute bottom-3 right-3 bg-black/70 p-1.5 rounded-lg border border-gray-700">
+                            <svg class="w-4 h-4 text-white fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    `;
                 } else {
                     htmlCard += `<img src="${item.data}" class="w-full h-full object-cover">`;
                 }
 
-                // Overlay penunjuk saat mode biasa (muncul tulisan klik untuk download)
                 if (!isSelectMode) {
                     htmlCard += `
                         <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                            <span class="bg-gray-900/90 text-xs px-3 py-1.5 rounded-lg border border-gray-700 font-medium tracking-wide">⬇ Klik untuk Download</span>
-                        </div>
-                    `;
-                }
-
-                // Kotak Centang (Hanya muncul jika Mode Pilih Banyak Aktif)
-                if (isSelectMode) {
-                    htmlCard += `
-                        <div class="absolute top-3 left-3 w-6 h-6 rounded-full flex items-center justify-center border-2 ${isChecked ? 'bg-blue-500 border-blue-500' : 'bg-black/40 border-white'}">
-                            ${isChecked ? '✓' : ''}
-                        </div>
-                    `;
-                }
-
-                htmlCard += `</div>`;
-                gallery.innerHTML += htmlCard;
-            });
-        }
-    </script>
-</body>
-</html>
+                            <span class="bg-gray-900/90 text-xs px-3 py-1.5 rounded-lg border border-gray-700 font-medium tracking-wide">
+                              
