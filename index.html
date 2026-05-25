@@ -3,43 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRANNBOX - Safe Vault & Player</title>
+    <title>BRANNBOX - Safe Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-950 text-white min-h-screen p-6 font-sans">
 
     <div id="auth-section" class="max-w-md mx-auto mt-16 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-xl">
-        <div class="text-center mb-8">
+        <div class="text-center mb-6">
             <h1 class="text-4xl font-extrabold tracking-wider bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
                 BRANNBOX
             </h1>
             <p id="auth-title" class="text-gray-300 font-semibold mt-3 text-sm uppercase tracking-wide">Masuk ke Galeri</p>
             <p class="text-gray-400 text-xs mt-2 px-4 leading-relaxed">
-                Memounding Anda untuk menyimpan foto dan video, privasi terjaga.
+                Memudahkan Anda untuk menyimpan foto dan video, privasi terjaga.
             </p>
         </div>
         
         <div class="space-y-4">
-            <input type="email" id="email" placeholder="Email Anda" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none focus:border-blue-500">
-            <input type="password" id="password" placeholder="Password" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none focus:border-blue-500">
+            <div>
+                <label class="text-xs text-gray-400 block mb-1">Email</label>
+                <input type="email" id="email" placeholder="nama@email.com" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none focus:border-blue-500">
+            </div>
             
-            <div id="security-box" class="hidden space-y-4">
-                <p class="text-xs text-yellow-400 font-semibold">*Pertanyaan Pemulihan jika Lupa Password:</p>
-                <input type="text" id="security-answer" placeholder="Siapa nama hewan peliharaan pertama Anda?" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none">
+            <div>
+                <label class="text-xs text-gray-400 block mb-1">Password</label>
+                <input type="password" id="password" placeholder="••••••••" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none focus:border-blue-500">
+            </div>
+            
+            <div id="security-box" class="hidden">
+                <label class="text-xs text-yellow-400 block mb-1">*Pertanyaan Pemulihan (Jika Lupa Password)</label>
+                <input type="text" id="security-answer" placeholder="Siapa nama hewan peliharaan pertama Anda?" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none focus:border-purple-500">
             </div>
 
-            <div id="action-buttons" class="flex gap-2">
-                <button onclick="handleLogin()" id="btn-login" class="w-1/2 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold transition">Masuk</button>
-                <button onclick="toggleMode(false)" id="btn-goto-signup" class="w-1/2 bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-semibold transition">Daftar Baru</button>
+            <div id="action-buttons" class="flex gap-2 pt-2">
+                <button type="button" id="btn-login" class="w-1/2 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold transition active:scale-95">Masuk</button>
+                <button type="button" id="btn-goto-signup" class="w-1/2 bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-semibold transition active:scale-95">Daftar Baru</button>
             </div>
 
-            <button onclick="handleSignUp()" id="btn-submit-signup" class="hidden w-full bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-semibold transition">Daftarkan Akun</button>
-            <button onclick="handleResetPassword()" id="btn-submit-reset" class="hidden w-full bg-yellow-600 hover:bg-yellow-500 py-3 rounded-xl font-semibold text-gray-950 transition">Pulihkan Password</button>
+            <button type="button" id="btn-submit-signup" class="hidden w-full bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-semibold transition active:scale-95">Daftarkan Akun</button>
+            <button type="button" id="btn-submit-reset" class="hidden w-full bg-yellow-600 hover:bg-yellow-500 py-3 rounded-xl font-semibold text-gray-950 transition active:scale-95">Pulihkan Password</button>
             
             <div class="text-center pt-2 space-y-2">
-                <button onclick="toggleMode('forgot')" id="btn-forgot-link" class="block w-full text-sm text-gray-400 hover:underline">Lupa Password?</button>
-                <button onclick="toggleMode(true)" id="btn-back-link" class="hidden text-sm text-blue-400 hover:underline">← Kembali ke Login</button>
+                <button type="button" id="btn-forgot-link" class="block w-full text-sm text-gray-400 hover:underline">Lupa Password?</button>
+                <button type="button" id="btn-back-link" class="hidden text-sm text-blue-400 hover:underline">← Kembali ke Login</button>
             </div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-gray-800/60 text-center">
+            <button type="button" id="btn-emergency-clear" class="text-[11px] text-red-400/70 hover:text-red-400 hover:underline">
+                🚫 Bersihkan Error Memori Browser
+            </button>
         </div>
     </div>
 
@@ -49,30 +62,30 @@
                 <span class="text-xl font-black tracking-wider text-blue-500">BRANNBOX</span>
                 <div class="w-px h-6 bg-gray-700"></div>
                 <div>
-                    <p class="text-[10px] text-gray-400 uppercase">User</p>
+                    <p class="text-[10px] text-gray-400 uppercase">User Aktif</p>
                     <span id="user-email" class="font-semibold text-gray-200 text-sm"></span>
                 </div>
             </div>
-            <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-xl text-sm font-semibold transition">Keluar</button>
+            <button type="button" id="btn-logout" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-xl text-sm font-semibold transition">Keluar</button>
         </div>
 
         <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 text-center mb-8">
             <p class="mb-4 text-gray-300">Pilih satu atau banyak file sekaligus untuk disimpan aman</p>
-            <input type="file" id="file-chooser" accept="image/*,video/*" multiple class="hidden" onchange="previewFileName()">
-            <label for="file-chooser" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 px-6 py-3 rounded-xl cursor-pointer font-semibold inline-block">
+            <input type="file" id="file-chooser" accept="image/*,video/*" multiple class="hidden">
+            <label id="label-chooser" for="file-chooser" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 px-6 py-3 rounded-xl cursor-pointer font-semibold inline-block transition">
                 + Pilih File
             </label>
-            <button onclick="uploadMultipleFiles()" class="ml-2 bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-xl font-semibold transition">Simpan Semua</button>
+            <button type="button" id="btn-upload-submit" class="ml-2 bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-xl font-semibold transition">Simpan Semua</button>
             <p id="file-name-preview" class="text-sm mt-3 text-yellow-400 font-medium"></p>
         </div>
 
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-xl font-bold">Koleksi Anda</h3>
             <div class="space-x-2">
-                <button id="btn-toggle-select" onclick="toggleSelectMode()" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl text-sm font-semibold border border-gray-700 transition">
+                <button type="button" id="btn-toggle-select" class="bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl text-sm font-semibold border border-gray-700 transition">
                     Pilih Banyak
                 </button>
-                <button id="btn-download-selected" onclick="downloadSelectedFiles()" class="hidden bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl text-sm font-semibold transition">
+                <button type="button" id="btn-download-selected" class="hidden bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-xl text-sm font-semibold transition">
                     Download Terpilih (0)
                 </button>
             </div>
@@ -83,7 +96,7 @@
     </div>
 
     <div id="media-modal" class="hidden fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-4">
-        <button onclick="closeMediaModal()" class="absolute top-4 right-4 bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-full border border-gray-700 transition">
+        <button type="button" id="btn-close-modal" class="absolute top-4 right-4 bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-full border border-gray-700 transition">
             ✕ Tutup
         </button>
         
@@ -94,26 +107,58 @@
 
         <div class="mt-4 text-center space-y-2">
             <p id="modal-filename" class="text-sm text-gray-400 truncate max-w-md mx-auto"></p>
-            <button id="modal-download-btn" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl text-sm font-semibold transition">
+            <button type="button" id="modal-download-btn" class="bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded-xl text-sm font-semibold transition">
                 ⬇ Download File Ini
             </button>
         </div>
     </div>
 
-
     <script>
+        // State management global
         let currentActiveUser = null;
         let isSelectMode = false;
         let selectedIndexes = [];
 
-        // Auto Login System
-        window.onload = function() {
-            const savedSession = localStorage.getItem('session_user');
-            if (savedSession) {
-                currentActiveUser = savedSession;
-                masukDashboard();
+        // === PASANG EVENT LISTENER SECARA AMAN (Mencegah tombol mati/mati klik) ===
+        document.addEventListener("DOMContentLoaded", function() {
+            // Pasang trigger tombol login/register halaman awal
+            document.getElementById('btn-login').addEventListener('click', handleLogin);
+            document.getElementById('btn-goto-signup').addEventListener('click', () => toggleMode(false));
+            document.getElementById('btn-submit-signup').addEventListener('click', handleSignUp);
+            document.getElementById('btn-submit-reset').addEventListener('click', handleResetPassword);
+            document.getElementById('btn-forgot-link').addEventListener('click', () => toggleMode('forgot'));
+            document.getElementById('btn-back-link').addEventListener('click', () => toggleMode(true));
+            
+            // Pasang trigger di dashboard & modal
+            document.getElementById('btn-logout').addEventListener('click', handleLogout);
+            document.getElementById('file-chooser').addEventListener('change', previewFileName);
+            document.getElementById('btn-upload-submit').addEventListener('click', uploadMultipleFiles);
+            document.getElementById('btn-toggle-select').addEventListener('click', toggleSelectMode);
+            document.getElementById('btn-download-selected').addEventListener('click', downloadSelectedFiles);
+            document.getElementById('btn-close-modal').addEventListener('click', closeMediaModal);
+
+            // Tombol reset darurat
+            document.getElementById('btn-emergency-clear').addEventListener('click', function() {
+                localStorage.clear();
+                alert('Semua memori error berhasil dibersihkan! Halaman akan dimuat ulang.');
+                window.location.reload();
+            });
+
+            // Jalankan sistem auto login
+            checkAutoLogin();
+        });
+
+        function checkAutoLogin() {
+            try {
+                const savedSession = localStorage.getItem('session_user');
+                if (savedSession) {
+                    currentActiveUser = savedSession;
+                    masukDashboard();
+                }
+            } catch (e) {
+                console.error("Gagal memuat auto login session:", e);
             }
-        };
+        }
 
         function toggleMode(mode) {
             const title = document.getElementById('auth-title');
@@ -123,7 +168,6 @@
             const btnSubmitReset = document.getElementById('btn-submit-reset');
             const btnForgotLink = document.getElementById('btn-forgot-link');
             const btnBackLink = document.getElementById('btn-back-link');
-            const passwordInput = document.getElementById('password');
 
             if (mode === true) {
                 title.innerText = "Masuk ke Galeri";
@@ -133,7 +177,6 @@
                 btnSubmitReset.classList.add('hidden');
                 btnForgotLink.classList.remove('hidden');
                 btnBackLink.classList.add('hidden');
-                passwordInput.classList.remove('hidden');
             } else if (mode === false) {
                 title.innerText = "Daftar Akun Baru";
                 securityBox.classList.remove('hidden');
@@ -142,7 +185,6 @@
                 btnSubmitReset.classList.add('hidden');
                 btnForgotLink.classList.add('hidden');
                 btnBackLink.classList.remove('hidden');
-                passwordInput.classList.remove('hidden');
             } else if (mode === 'forgot') {
                 title.innerText = "Pemulihan Akun";
                 securityBox.classList.remove('hidden');
@@ -151,7 +193,6 @@
                 btnSubmitReset.classList.remove('hidden');
                 btnForgotLink.classList.add('hidden');
                 btnBackLink.classList.remove('hidden');
-                passwordInput.classList.add('hidden');
             }
         }
 
@@ -182,14 +223,18 @@
             const storedData = localStorage.getItem('user_' + email);
             if (!storedData) return alert('Akun tidak ditemukan. Silakan daftar dulu!');
 
-            const account = JSON.parse(storedData);
-            if (account.password !== password) {
-                return alert('Password salah! Akses ditolak.');
-            }
+            try {
+                const account = JSON.parse(storedData);
+                if (account.password !== password) {
+                    return alert('Password salah! Akses ditolak.');
+                }
 
-            currentActiveUser = email;
-            localStorage.setItem('session_user', email); 
-            masukDashboard();
+                currentActiveUser = email;
+                localStorage.setItem('session_user', email); 
+                masukDashboard();
+            } catch(e) {
+                alert('Data akun korup karena sisa data versi lama. Klik tombol merah di bawah untuk reset.');
+            }
         }
 
         function handleResetPassword() {
@@ -259,7 +304,7 @@
                             setTimeout(() => preview.innerText = "", 2000);
                             tampilkanMedia();
                         } catch (e) {
-                            alert('Memori penuh! Kurangi jumlah/ukuran file.');
+                            alert('Gagal menyimpan! Kapasitas penyimpanan memori browser penuh bray.');
                         }
                     }
                 };
@@ -287,8 +332,8 @@
             tampilkanMedia(); 
         }
 
-        // PERBAIKAN: Parameter string dibungkus dengan aman agar tidak merusak HTML onClick
-        function handleMediaClick(index) {
+        // AMAN: Klik card murni memakai nomor index data internal, bukan mengirim teks panjang HTML
+        function handleMediaCardClick(index) {
             const storageKey = 'gallery_' + currentActiveUser;
             const userGallery = JSON.parse(localStorage.getItem(storageKey)) || [];
             const item = userGallery[index];
@@ -333,7 +378,6 @@
         function closeMediaModal() {
             const modal = document.getElementById('media-modal');
             const modalVideo = document.getElementById('modal-video');
-            
             modalVideo.pause(); 
             modalVideo.src = ""; 
             modal.classList.add('hidden');
@@ -353,57 +397,4 @@
         }
 
         function downloadSelectedFiles() {
-            if (selectedIndexes.length === 0) return alert('Pilih minimal 1 file!');
-
-            const storageKey = 'gallery_' + currentActiveUser;
-            const userGallery = JSON.parse(localStorage.getItem(storageKey)) || [];
-            
-            selectedIndexes.forEach((index, i) => {
-                const item = userGallery[index];
-                const extension = item.type.split('/')[1] || 'jpg';
-                const fixName = item.name || `file_${i + 1}.${extension}`;
-                
-                setTimeout(() => {
-                    pemicuDownload(item.data, fixName);
-                }, i * 150); 
-            });
-
-            toggleSelectMode(); 
-        }
-
-        function tampilkanMedia() {
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-            
-            const storageKey = 'gallery_' + currentActiveUser;
-            const userGallery = JSON.parse(localStorage.getItem(storageKey)) || [];
-
-            if(userGallery.length === 0) {
-                gallery.innerHTML = '<p class="text-gray-500 text-sm col-span-full text-center py-8">Galeri kosong.</p>';
-                return;
-            }
-
-            userGallery.forEach((item, index) => {
-                const isChecked = selectedIndexes.includes(index);
-                const isVideo = item.type && item.type.startsWith('video/');
-                
-                // Cukup lempar index saja ke fungsi click agar string data aman dari crash tanda kutip
-                let htmlCard = `
-                    <div onclick="handleMediaClick(${index})" 
-                         class="relative cursor-pointer group rounded-xl overflow-hidden border ${isChecked ? 'border-blue-500 ring-4 ring-blue-500/30' : 'border-gray-800 hover:border-gray-600'} transition bg-black h-48">
-                `;
-
-                if (isVideo) {
-                    htmlCard += `
-                        <video src="${item.data}" class="w-full h-full object-cover pointer-events-none"></video>
-                        <div class="absolute bottom-3 right-3 bg-black/70 p-1.5 rounded-lg border border-gray-700">
-                            <svg class="w-4 h-4 text-white fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    `;
-                } else {
-                    htmlCard += `<img src="${item.data}" class="w-full h-full object-cover">`;
-                }
-
-                if (!isSelectMode) {
-                    htmlCard += `
-                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:op
+            if (selectedIndexe
