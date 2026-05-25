@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Vault - Photo & Video Storage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-white flex items-center justify-center min-h-screen font-sans">
+
+    <div class="bg-gray-900 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-gray-800">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold tracking-wide bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">SECURE VAULT</h1>
+            <p class="text-gray-400 text-sm mt-2" id="auth-subtitle">Masuk untuk mengakses galeri aman Anda</p>
+        </div>
+
+        <!-- Form Autentikasi -->
+        <form id="auth-form" class="space-y-5">
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2 font-semibold">Alamat Email</label>
+                <input type="email" id="email" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition" placeholder="nama@email.com">
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2 font-semibold">Password</label>
+                <input type="password" id="password" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition" placeholder="••••••••">
+            </div>
+
+            <!-- Opsi Lupa Password (Hanya muncul saat mode Login) -->
+            <div class="flex justify-end text-sm" id="forgot-password-container">
+                <button type="button" id="btn-forgot" class="text-blue-400 hover:underline">Lupa Password?</button>
+            </div>
+
+            <!-- Tombol Submit Utama -->
+            <button type="submit" id="btn-primary" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-blue-500/20">
+                Masuk
+            </button>
+        </form>
+
+        <!-- Footer / Switch Mode -->
+        <div class="mt-6 text-center text-sm text-gray-400">
+            <span id="switch-text">Belum punya akun?</span>
+            <button id="btn-switch" class="text-purple-400 font-semibold ml-1 hover:underline">Daftar Sekarang</button>
+        </div>
+    </div>
+
+    <!-- Script Logika Interaksi Antarmuka -->
+    <script>
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const btnPrimary = document.getElementById('btn-primary');
+        const btnSwitch = document.getElementById('btn-switch');
+        const switchText = document.getElementById('switch-text');
+        const forgotContainer = document.getElementById('forgot-password-container');
+        
+        let isLoginMode = true;
+
+        btnSwitch.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            if (!isLoginMode) {
+                authSubtitle.innerText = "Buat akun baru untuk mulai menyimpan file";
+                btnPrimary.innerText = "Daftar Akun";
+                switchText.innerText = "Sudah punya akun?";
+                btnSwitch.innerText = "Log In";
+                forgotContainer.classList.add('hidden');
+            } else {
+                authSubtitle.innerText = "Masuk untuk mengakses galeri aman Anda";
+                btnPrimary.innerText = "Masuk";
+                switchText.innerText = "Belum punya akun?";
+                btnSwitch.innerText = "Daftar Sekarang";
+                forgotContainer.classList.remove('hidden');
+            }
+        });
+
+        // Trigger Lupa Password
+        document.getElementById('btn-forgot').addEventListener('click', () => {
+            const email = document.getElementById('email').value;
+            if(!email) {
+                alert('Silakan isi kolom email terlebih dahulu untuk mengirim link reset password.');
+                return;
+            }
+            // Di sini nanti dihubungkan ke fungsi Firebase/Supabase resetPassword(email)
+            alert(`Link reset password telah dikirim ke: ${email}`);
+        });
+    </script>
+</body>
+</html>
