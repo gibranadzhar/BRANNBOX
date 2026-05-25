@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galeri Rahasia Lokal</title>
+    <title>Galeri Rahasia Lokal (Auto Login)</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-950 text-white min-h-screen p-6 font-sans">
@@ -54,7 +54,7 @@
             <p id="file-name-preview" class="text-sm mt-3 text-gray-400"></p>
         </div>
 
-        <h3 class="text-xl font-bold mb-4">Brann Vault - Koleksi Anda</h3>
+        <h3 class="text-xl font-bold mb-4">Koleksi Anda</h3>
         <div id="gallery" class="grid grid-cols-2 md:grid-cols-3 gap-4">
             </div>
     </div>
@@ -62,7 +62,16 @@
     <script>
         let currentActiveUser = null;
 
-        // FUNGSI GANTI MODAL TAMPILAN
+        // === FITUR AUTO LOGIN KETIKA PAGE DI-REFRESH ATAU DI-OPEN KEMBALI ===
+        window.onload = function() {
+            const savedSession = localStorage.getItem('session_user');
+            if (savedSession) {
+                // Jika session ditemukan, langsung login otomatis
+                currentActiveUser = savedSession;
+                masukDashboard();
+            }
+        };
+
         function toggleMode(mode) {
             const title = document.getElementById('auth-title');
             const securityBox = document.getElementById('security-box');
@@ -73,7 +82,7 @@
             const btnBackLink = document.getElementById('btn-back-link');
             const passwordInput = document.getElementById('password');
 
-            if (mode === true) { // Ke Mode Login
+            if (mode === true) {
                 title.innerText = "MASUK KE GALERI";
                 securityBox.classList.add('hidden');
                 actionButtons.classList.remove('hidden');
@@ -82,7 +91,7 @@
                 btnForgotLink.classList.remove('hidden');
                 btnBackLink.classList.add('hidden');
                 passwordInput.classList.remove('hidden');
-            } else if (mode === false) { // Ke Mode Daftar Akun
+            } else if (mode === false) {
                 title.innerText = "DAFTAR AKUN BARU";
                 securityBox.classList.remove('hidden');
                 actionButtons.classList.add('hidden');
@@ -91,7 +100,7 @@
                 btnForgotLink.classList.add('hidden');
                 btnBackLink.classList.remove('hidden');
                 passwordInput.classList.remove('hidden');
-            } else if (mode === 'forgot') { // Ke Mode Lupa Password
+            } else if (mode === 'forgot') {
                 title.innerText = "PEMULIHAN AKUN";
                 securityBox.classList.remove('hidden');
                 actionButtons.classList.add('hidden');
@@ -99,11 +108,10 @@
                 btnSubmitReset.classList.remove('hidden');
                 btnForgotLink.classList.add('hidden');
                 btnBackLink.classList.remove('hidden');
-                passwordInput.classList.add('hidden'); // Sembunyikan input password
+                passwordInput.classList.add('hidden');
             }
         }
 
-        // 1. SISTEM DAFTAR AKUN (SIGN UP)
         function handleSignUp() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -111,12 +119,10 @@
 
             if (!email || !password || !answer) return alert('Semua kolom wajib diisi!');
 
-            // Cek apakah email sudah terdaftar sebelumnya
             if (localStorage.getItem('user_' + email)) {
                 return alert('Email ini sudah terdaftar! Silakan login.');
             }
 
-            // Simpan data akun ke dalam LocalStorage
             const userData = { password: password, securityAnswer: answer };
             localStorage.setItem('user_' + email, JSON.stringify(userData));
 
@@ -124,7 +130,6 @@
             toggleMode(true);
         }
 
-        // 2. SISTEM LOGIN KETAT
         function handleLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -137,12 +142,13 @@
                 return alert('Password salah! Akses ditolak.');
             }
 
-            // Jika benar, masuk ke dashboard
+            // SIMPAN SESSION (Biar gak logout pas di-refresh / browser ditutup)
             currentActiveUser = email;
+            localStorage.setItem('session_user', email); 
+            
             masukDashboard();
         }
 
-        // 3. SISTEM LUPA PASSWORD
         function handleResetPassword() {
             const email = document.getElementById('email').value.trim();
             const answer = document.getElementById('security-answer').value.trim().toLowerCase();
@@ -159,7 +165,6 @@
             }
         }
 
-        // 4. MASUK KE DASHBOARD
         function masukDashboard() {
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('dashboard-section').classList.remove('hidden');
@@ -167,9 +172,11 @@
             tampilkanMedia();
         }
 
-        // 5. KELUAR (LOGOUT)
+        // HAPUS SESSION SAAT KELUAR (LOGOUT)
         function handleLogout() {
             currentActiveUser = null;
+            localStorage.removeItem('session_user'); // Hapus jejak login otomatis
+            
             document.getElementById('auth-section').classList.remove('hidden');
             document.getElementById('dashboard-section').classList.add('hidden');
             document.getElementById('email').value = '';
@@ -177,13 +184,11 @@
             document.getElementById('security-answer').value = '';
         }
 
-        // Tampilkan info nama file saat dipilih
         function previewFileName() {
             const file = document.getElementById('file-chooser').files[0];
             if (file) document.getElementById('file-name-preview').innerText = "Terpilih: " + file.name;
         }
 
-        // 6. PROSES SIMPAN FOTO / VIDEO (Ubah Ke Base64)
         function uploadFile() {
             const fileInput = document.getElementById('file-chooser');
             const file = fileInput.files[0];
@@ -194,23 +199,21 @@
                 const base64Data = reader.result;
                 const storageKey = 'gallery_' + currentActiveUser;
 
-                // Ambil data galeri user yang sudah ada atau bikin array baru
                 let userGallery = JSON.parse(localStorage.getItem(storageKey)) || [];
                 userGallery.push({ type: file.type, data: base64Data });
 
                 try {
                     localStorage.setItem(storageKey, JSON.stringify(userGallery));
                     document.getElementById('file-name-preview').innerText = "";
-                    fileInput.value = ""; // reset input
+                    fileInput.value = ""; 
                     tampilkanMedia();
                 } catch (e) {
-                    alert('Gagal menyimpan! Ukuran file foto/video terlalu besar untuk memori lokal browser.');
+                    alert('Gagal menyimpan! Ukuran file terlalu besar untuk memori lokal browser.');
                 }
             }
             reader.readAsDataURL(file);
         }
 
-        // 7. AMBIL & TAMPILKAN GALERI KHUSUS USER YANG LOGIN
         function tampilkanMedia() {
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = '';
