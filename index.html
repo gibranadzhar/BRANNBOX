@@ -3,113 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRANNBOX - Safe Vault</title>
+    <title>BRANNBOX - Safe Vault Premium</title>
     <style>
-        body { background-color: #0b0f19; color: #ffffff; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; box-sizing: border-box; }
+        /* Desain Dasar Global - Cyberpunk Glassmorphism */
+        body { 
+            background: radial-gradient(circle at top, #1e1b4b 0%, #090514 100%); 
+            color: #ffffff; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            box-sizing: border-box; 
+        }
         .hidden { display: none !important; }
-        button { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; }
+        
+        /* Efek Tombol Modern */
+        button { 
+            padding: 12px 20px; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-size: 14px; 
+            transition: all 0.2s ease; 
+        }
         button:active { transform: scale(0.95); }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; background-color: #1f2937; border: 1px solid #374151; color: white; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
         
-        .auth-box { background-color: #111827; padding: 30px; border-radius: 15px; border: 1px solid #1f2937; width: 100%; max-width: 360px; text-align: center; margin-top: 40px; }
-        h1 { color: #3b82f6; margin: 0 0 5px 0; font-size: 32px; font-weight: 800; }
-        .slogan { color: #9ca3af; font-size: 12px; margin-bottom: 25px; }
-        .btn-group { display: flex; gap: 10px; justify-content: center; }
-        .btn-blue { background-color: #2563eb; color: white; width: 50%; }
-        .btn-purple { background-color: #7c3aed; color: white; width: 50%; }
+        /* Input Field Estetik */
+        .input-group { position: relative; margin-bottom: 18px; width: 100%; box-sizing: border-box; }
+        input { 
+            width: 100%; 
+            padding: 12px 40px 12px 12px; 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            color: white; 
+            border-radius: 10px; 
+            font-size: 14px; 
+            box-sizing: border-box; 
+            transition: all 0.3s;
+        }
+        input:focus { 
+            border-color: #3b82f6; 
+            background: rgba(255, 255, 255, 0.08); 
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); 
+            outline: none; 
+        }
+        label { display: block; text-align: left; font-size: 11px; color: #a5b4fc; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Fitur Intip Password */
+        .eye-btn { 
+            position: absolute; 
+            right: 12px; 
+            top: 34px; 
+            background: none; 
+            border: none; 
+            color: #64748b; 
+            cursor: pointer; 
+            padding: 0; 
+            font-size: 13px; 
+            font-weight: bold;
+        }
+        .eye-btn:hover { color: #93c5fd; }
+
+        /* Kotak Halaman Login Modern */
+        .auth-box { 
+            background: rgba(15, 12, 30, 0.65); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            padding: 35px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            width: 100%; 
+            max-width: 380px; 
+            text-align: center; 
+            margin-top: 50px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); 
+        }
+        h1 { 
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin: 0 0 5px 0; 
+            font-size: 36px; 
+            font-weight: 900; 
+            letter-spacing: 2px; 
+        }
+        .slogan { color: #94a3b8; font-size: 12px; margin-bottom: 25px; line-height: 1.6; }
         
-        .dashboard { width: 100%; max-width: 800px; margin-top: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; background-color: #111827; padding: 15px 20px; border-radius: 12px; border: 1px solid #1f2937; margin-bottom: 25px; }
-        .logo-text { font-size: 20px; font-weight: 900; color: #3b82f6; }
+        /* Pengaturan Tombol Aksi */
+        .btn-group { display: flex; gap: 10px; justify-content: center; width: 100%; }
+        .btn-blue { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; width: 50%; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+        .btn-blue:hover { box-shadow: 0 4px 20px rgba(37, 99, 235, 0.5); }
+        .btn-purple { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; width: 50%; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); }
+        .btn-purple:hover { box-shadow: 0 4px 20px rgba(124, 58, 237, 0.5); }
+        .btn-full { width: 100% !important; }
+
+        /* Dashboard Premium */
+        .dashboard { width: 100%; max-width: 850px; margin-top: 20px; }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: rgba(15, 12, 30, 0.6); 
+            backdrop-filter: blur(10px);
+            padding: 15px 25px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            margin-bottom: 25px; 
+        }
+        .logo-text { font-size: 22px; font-weight: 900; background: linear-gradient(45deg, #3b82f6, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .btn-red { background: #ef4444; color: white; padding: 8px 18px; border-radius: 8px; font-size: 13px; }
         
-        .upload-zone { background-color: #111827; border: 1px solid #1f2937; padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px; }
-        .btn-choose { background-color: #4f46e5; color: white; display: inline-block; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-emerald { background-color: #059669; color: white; }
-        
-        .grid-gallery { display: grid; grid-template-cols: repeat(2, 1fr); gap: 15px; width: 100%; }
+        /* Zona Upload Dashboard */
+        .upload-zone { 
+            background: rgba(255, 255, 255, 0.02); 
+            border: 2px dashed rgba(255, 255, 255, 0.1); 
+            padding: 35px; 
+            border-radius: 16px; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            transition: 0.3s;
+        }
+        .upload-zone:hover { border-color: #3b82f6; background: rgba(255, 255, 255, 0.04); }
+        .btn-choose { background: #4f46e5; color: white; display: inline-block; padding: 12px 26px; border-radius: 10px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        .btn-emerald { background: #10b981; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+
+        /* Grid Galeri Item */
+        .gallery-menu { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-gray { background: #334155; color: white; border: 1px solid rgba(255,255,255,0.1); }
+        .grid-gallery { display: grid; grid-template-cols: repeat(2, 1fr); gap: 18px; width: 100%; }
         @media (min-width: 600px) { .grid-gallery { grid-template-cols: repeat(3, 1fr); } }
         
-        .media-card { background-color: #000; height: 180px; border-radius: 12px; overflow: hidden; border: 1px solid #1f2937; cursor: pointer; position: relative; }
+        /* Kartu Media */
+        .media-card { background-color: #000; height: 190px; border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .media-card:hover { transform: translateY(-4px); border-color: #3b82f6; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
         .media-card img, .media-card video { width: 100%; height: 100%; object-fit: cover; }
+        .selected-card { border-color: #3b82f6 !important; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5) !important; }
         
-        .video-badge { position: absolute; bottom: 10px; right: 10px; background-color: rgba(0,0,0,0.7); padding: 5px; border-radius: 6px; }
-        .hover-overlay { position: absolute; inset: 0; background-color: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; font-size: 12px; }
+        /* Lencana Informasi di Kartu */
+        .video-badge { position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.75); padding: 6px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; }
+        .check-badge { position: absolute; top: 12px; left: 12px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid white; background-color: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+        .checked-active { background-color: #3b82f6 !important; border-color: #3b82f6 !important; }
+        .hover-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; font-size: 13px; font-weight: bold; letter-spacing: 0.5px; }
         .media-card:hover .hover-overlay { opacity: 1; }
 
-        .modal { display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.95); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { max-width: 100%; max-height: 70vh; border-radius: 8px; }
-        .btn-close { position: absolute; top: 20px; right: 20px; background-color: #374151; color: white; padding: 10px 20px; border-radius: 20px; }
+        /* Modal Player Pop-up */
+        .modal { display: none; position: fixed; inset: 0; background-color: rgba(5, 3, 13, 0.96); z-index: 100; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { max-width: 100%; max-height: 70vh; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-close { position: absolute; top: 20px; right: 20px; background-color: #1e293b; color: white; padding: 10px 22px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
 
+    <!-- 1. HALAMAN AUTENTIKASI (LOGIN / DAFTAR / LOGOUT) -->
     <div id="auth-section" class="auth-box">
         <h1>BRANNBOX</h1>
-        <p id="auth-title" style="font-size: 14px; font-weight: bold; color: #e5e7eb; margin-top: 5px;">Masuk ke Galeri</p>
-        <p class="slogan">Memudahan Anda menyimpan foto & video secara aman.</p>
+        <p id="auth-title">Masuk ke Galeri</p>
+        <p class="slogan">Memudahkan Anda untuk menyimpan foto dan video, privasi terjaga.</p>
         
         <div>
-            <input type="email" id="email" placeholder="Email Anda" value="test@gmail.com">
-            <input type="password" id="password" placeholder="Password" value="123">
+            <div class="input-group">
+                <label>Email Anda</label>
+                <input type="email" id="email" placeholder="nama@email.com">
+            </div>
             
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••">
+                <button type="button" class="eye-btn" onclick="togglePasswordView()">LIHAT</button>
+            </div>
+            
+            <!-- Elemen Pertanyaan Pemulihan -->
+            <div id="security-box" class="hidden">
+                <div class="input-group">
+                    <label style="color:#fbbf24;">*Pertanyaan Pemulihan (Jika Lupa)</label>
+                    <input type="text" id="security-answer" placeholder="Siapa nama hewan peliharaan pertama Anda?">
+                </div>
+            </div>
+
+            <!-- Tombol Kontrol Penentu -->
             <div id="action-buttons" class="btn-group">
-                <button type="button" onclick="handleLogin()" class="btn-blue" style="width:100%">Masuk (Klik Sini)</button>
+                <button type="button" onclick="handleLogin()" class="btn-blue">Masuk</button>
+                <button type="button" onclick="toggleMode(false)" class="btn-purple">Daftar Baru</button>
+            </div>
+
+            <button type="button" id="btn-submit-signup" onclick="handleSignUp()" class="btn-purple btn-full hidden">Daftarkan Akun Baru</button>
+            <button type="button" id="btn-submit-reset" onclick="handleResetPassword()" class="btn-blue btn-full hidden" style="background:linear-gradient(135deg, #d97706, #b45309)">Pulihkan Akun</button>
+            
+            <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
+                <button type="button" id="btn-forgot-link" onclick="toggleMode('forgot')" style="background:none; color:#94a3b8; font-size:12px; text-decoration:underline;">Lupa Password?</button>
+                <button type="button" id="btn-back-link" onclick="toggleMode(true)" class="hidden" style="background:none; color:#3b82f6; font-size:12px; font-weight: bold;">← Kembali ke Halaman Login</button>
             </div>
         </div>
     </div>
 
+    <!-- 2. HALAMAN UTAMA DASHBOARD STORAGE -->
     <div id="dashboard-section" class="dashboard hidden">
         <div class="header">
-            <span class="logo-text">BRANNBOX DASHBOARD</span>
-            <button type="button" onclick="handleLogout()" style="background-color: #dc2626; color: white; padding: 8px 16px;">Keluar</button>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span class="logo-text">BRANNBOX</span>
+                <div style="width:1px; height:20px; background-color:rgba(255,255,255,0.2);"></div>
+                <span id="user-email" style="font-size:13px; color:#cbd5e1; font-weight:500;"></span>
+            </div>
+            <button type="button" onclick="handleLogout()" class="btn-red">Keluar Akun</button>
         </div>
 
         <div class="upload-zone">
-            <p style="margin: 0 0 15px 0; color:#e5e7eb;">Pilih file video atau foto kamu:</p>
+            <p style="margin: 0 0 18px 0; color:#e2e8f0; font-size:15px; font-weight:500;">Pilih satu atau banyak file sekaligus untuk disimpan aman</p>
             <input type="file" id="file-chooser" accept="image/*,video/*" multiple class="hidden" onchange="previewFileName()">
             <label for="file-chooser" class="btn-choose">+ Pilih File</label>
-            <button type="button" onclick="uploadMultipleFiles()" class="btn-emerald" style="margin-left: 8px;">Simpan Ke Galeri</button>
-            <p id="file-name-preview" style="color: #f59e0b; font-size: 13px; margin-top: 10px;"></p>
+            <button type="button" onclick="uploadMultipleFiles()" class="btn-emerald" style="margin-left: 8px;">Simpan Semua</button>
+            <p id="file-name-preview" style="color: #fbbf24; font-size: 13px; margin-top: 12px; font-weight: 500;"></p>
         </div>
 
-        <h3 style="margin-bottom:15px;">Koleksi Galeri Terbuka</h3>
-        <div id="gallery" class="grid-gallery">
+        <div class="gallery-menu">
+            <h3 style="margin:0; font-size:19px; font-weight:700; letter-spacing:0.5px;">Koleksi Anda</h3>
+            <div style="display:flex; gap:8px;">
+                <button type="button" id="btn-toggle-select" onclick="toggleSelectMode()" class="btn-gray">Pilih Banyak</button>
+                <button type="button" id="btn-download-selected" onclick="downloadSelectedFiles()" class="btn-blue hidden">Download Terpilih (0)</button>
             </div>
+        </div>
+
+        <div id="gallery" class="grid-gallery">
+            <!-- File internal diletakkan lewat runtime javascript -->
+        </div>
     </div>
 
+    <!-- 3. POP-UP PEMUTAR VIDEO / IMAGE VIEW MODAL -->
     <div id="media-modal" class="modal">
         <button type="button" onclick="closeMediaModal()" class="btn-close">✕ Tutup</button>
-        <div style="width:100%; max-width:700px; display:flex; justify-content:center;">
+        
+        <div style="width:100%; max-width:720px; display:flex; justify-content:center;">
             <img id="modal-img" class="modal-content hidden" src="">
             <video id="modal-video" controls class="modal-content hidden" src=""></video>
         </div>
-        <p id="modal-filename" style="font-size:13px; color:#9ca3af; margin-top:10px;"></p>
+        
+        <div style="margin-top:20px; text-align:center;">
+            <p id="modal-filename" style="font-size:13px; color:#94a3b8; margin-bottom:12px; max-width:400px; truncate;"></p>
+            <button type="button" id="modal-download-btn" class="btn-blue" style="width:auto; padding:10px 25px;">⬇ Download File Ini</button>
+        </div>
     </div>
 
+    <!-- LOGIKA JAVASCRIPT LOGIC -->
     <script>
-        // Array penyimpanan runtime (Anti-Crash Browser)
+        // Simulasi Penyimpanan Runtime Terpusat (Bebas Crash LocalStorage)
+        let localUserDatabase = {}; 
         let memoryGallery = [];
+        
+        let currentActiveUser = null;
+        let isSelectMode = false;
+        let selectedIndexes = [];
+
+        function togglePasswordView() {
+            const passInput = document.getElementById('password');
+            const eyeBtn = document.querySelector('.eye-btn');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeBtn.innerText = 'SEMBUNYI';
+            } else {
+                passInput.type = 'password';
+                eyeBtn.innerText = 'LIHAT';
+            }
+        }
+
+        function toggleMode(mode) {
+            const title = document.getElementById('auth-title');
+            const securityBox = document.getElementById('security-box');
+            const actionButtons = document.getElementById('action-buttons');
+            const btnSubmitSignup = document.getElementById('btn-submit-signup');
+            const btnSubmitReset = document.getElementById('btn-submit-reset');
+            const btnForgotLink = document.getElementById('btn-forgot-link');
+            const btnBackLink = document.getElementById('btn-back-link');
+
+            if (mode === true) {
+                title.innerText = "Masuk ke Galeri";
+                securityBox.classList.add('hidden');
+                actionButtons.classList.remove('hidden');
+                btnSubmitSignup.classList.add('hidden');
+                btnSubmitReset.classList.add('hidden');
+                btnForgotLink.classList.remove('hidden');
+                btnBackLink.classList.add('hidden');
+            } else if (mode === false) {
+                title.innerText = "Daftar Akun Baru";
+                securityBox.classList.remove('hidden');
+                actionButtons.classList.add('hidden');
+                btnSubmitSignup.classList.remove('hidden');
+                btnSubmitReset.classList.add('hidden');
+                btnForgotLink.classList.add('hidden');
+                btnBackLink.classList.remove('hidden');
+            } else if (mode === 'forgot') {
+                title.innerText = "Pemulihan Akun";
+                securityBox.classList.remove('hidden');
+                actionButtons.classList.add('hidden');
+                btnSubmitSignup.classList.add('hidden');
+                btnSubmitReset.classList.remove('hidden');
+                btnForgotLink.classList.add('hidden');
+                btnBackLink.classList.remove('hidden');
+            }
+        }
+
+        function handleSignUp() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const answer = document.getElementById('security-answer').value.trim().toLowerCase();
+
+            if (!email || !password || !answer) return alert('Semua kolom wajib diisi bray!');
+            
+            if(localUserDatabase[email]) return alert('Email ini sudah terdaftar!');
+
+            localUserDatabase[email] = { password: password, securityAnswer: answer };
+            alert('Pendaftaran berhasil bray! Silakan login.');
+            toggleMode(true);
+        }
 
         function handleLogin() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
-            if (!email || !password) return alert('Isi data dulu!');
+            if (!email || !password) return alert('Isi email dan password-nya dulu!');
 
-            // Langsung lolos masuk dashboard tanpa hambatan database lokal
+            // Akun Default Admin / Penguji agar cepat
+            if (email === "test@gmail.com" && password === "123") {
+                localUserDatabase[email] = { password: "123", securityAnswer: "kucing" };
+            }
+
+            const userAccount = localUserDatabase[email];
+            if (!userAccount) return alert('Akun tidak ditemukan. Silakan daftar baru!');
+            if (userAccount.password !== password) return alert('Password salah bray!');
+
+            currentActiveUser = email;
             document.getElementById('auth-section').classList.add('hidden');
             document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('user-email').innerText = currentActiveUser;
             tampilkanMedia();
         }
 
+        function handleResetPassword() {
+            const email = document.getElementById('email').value.trim();
+            const answer = document.getElementById('security-answer').value.trim().toLowerCase();
+
+            if (!email || !answer) return alert('Email dan jawaban keamanan harus diisi!');
+
+            const userAccount = localUserDatabase[email];
+            if (!userAccount) return alert('Email tidak terdaftar!');
+
+            if (userAccount.securityAnswer === answer) {
+                alert(`Jawaban Cocok! Password Anda adalah: ${userAccount.password}`);
+                toggleMode(true);
+            } else {
+                alert('Jawaban pemulihan salah bray!');
+            }
+        }
+
         function handleLogout() {
+            currentActiveUser = null;
             document.getElementById('auth-section').classList.remove('hidden');
             document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('security-answer').value = '';
         }
 
         function previewFileName() {
             const files = document.getElementById('file-chooser').files;
-            document.getElementById('file-name-preview').innerText = `${files.length} file terpilih.`;
+            document.getElementById('file-name-preview').innerText = `${files.length} file dipilih, siap masuk box.`;
         }
 
         function uploadMultipleFiles() {
@@ -123,13 +383,13 @@
                 const reader = new FileReader();
 
                 reader.onloadend = function() {
-                    // Masukkan ke array ram memori langsung agar aman dari crash
                     memoryGallery.push({ type: file.type, name: file.name, data: reader.result });
                     processed++;
 
                     if (processed === files.length) {
-                        document.getElementById('file-name-preview').innerText = "Berhasil masuk galeri!";
+                        document.getElementById('file-name-preview').innerText = "Semua file aman disimpan!";
                         fileInput.value = "";
+                        setTimeout(() => { document.getElementById('file-name-preview').innerText = ""; }, 2000);
                         tampilkanMedia();
                     }
                 };
@@ -137,66 +397,5 @@
             }
         }
 
-        function handleCardClick(index) {
-            const item = memoryGallery[index];
-            const modal = document.getElementById('media-modal');
-            const modalImg = document.getElementById('modal-img');
-            const modalVideo = document.getElementById('modal-video');
-            
-            document.getElementById('modal-filename').innerText = item.name;
-
-            if (item.type && item.type.startsWith('video/')) {
-                modalImg.classList.add('hidden');
-                modalVideo.classList.remove('hidden');
-                modalVideo.src = item.data;
-                modalVideo.play();
-            } else {
-                modalVideo.classList.add('hidden');
-                modalImg.classList.remove('hidden');
-                modalImg.src = item.data;
-            }
-            modal.style.display = 'flex';
-        }
-
-        function closeMediaModal() {
-            const modalVideo = document.getElementById('modal-video');
-            modalVideo.pause();
-            modalVideo.src = "";
-            document.getElementById('media-modal').style.display = 'none';
-        }
-
-        function tampilkanMedia() {
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-
-            if (memoryGallery.length === 0) {
-                gallery.innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:#6b7280; font-size:14px;">Belum ada file. Silakan upload foto/video di atas!</p>';
-                return;
-            }
-
-            memoryGallery.forEach((item, index) => {
-                const isVideo = item.type && item.type.startsWith('video/');
-                const card = document.createElement('div');
-                card.className = 'media-card';
-                card.onclick = function() { handleCardClick(index); };
-
-                let html = '';
-                if (isVideo) {
-                    html += `
-                        <video src="${item.data}"></video>
-                        <div class="video-badge">
-                            <svg style="width:12px; height:12px; fill:#fff;" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                    `;
-                } else {
-                    html += `<img src="${item.data}">`;
-                }
-
-                html += `<div class="hover-overlay"><span>${isVideo ? '▶ Putar Video' : '🔍 Lihat Foto'}</span></div>`;
-                card.innerHTML = html;
-                gallery.appendChild(card);
-            });
-        }
-    </script>
-</body>
-</html>
+        function toggleSelectMode() {
+            isSelectMo
