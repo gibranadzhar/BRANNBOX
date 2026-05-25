@@ -1,87 +1,238 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Vault - Photo & Video Storage</title>
+    <title>Galeri Rahasia Lokal</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-950 text-white flex items-center justify-center min-h-screen font-sans">
+<body class="bg-gray-950 text-white min-h-screen p-6 font-sans">
 
-    <div class="bg-gray-900 p-8 rounded-2xl shadow-2xl w-full max-w-md border border-gray-800">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold tracking-wide bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">SECURE VAULT</h1>
-            <p class="text-gray-400 text-sm mt-2" id="auth-subtitle">Masuk untuk mengakses galeri aman Anda</p>
-        </div>
-
-        <!-- Form Autentikasi -->
-        <form id="auth-form" class="space-y-5">
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2 font-semibold">Alamat Email</label>
-                <input type="email" id="email" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition" placeholder="nama@email.com">
+    <div id="auth-section" class="max-w-md mx-auto mt-20 bg-gray-900 p-8 rounded-2xl border border-gray-800 shadow-xl">
+        <h2 id="auth-title" class="text-2xl font-bold mb-6 text-center text-blue-400">MASUK KE GALERI</h2>
+        
+        <div class="space-y-4">
+            <input type="email" id="email" placeholder="Email Anda" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none">
+            <input type="password" id="password" placeholder="Password" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none">
+            
+            <div id="security-box" class="hidden space-y-4">
+                <p class="text-xs text-yellow-400 font-semibold">*Pertanyaan Pemulihan jika Lupa Password:</p>
+                <input type="text" id="security-answer" placeholder="Siapa nama hewan peliharaan pertama Anda?" class="w-full p-3 bg-gray-800 rounded-xl border border-gray-700 text-white focus:outline-none">
             </div>
 
-            <div>
-                <label class="block text-xs uppercase tracking-wider text-gray-400 mb-2 font-semibold">Password</label>
-                <input type="password" id="password" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition" placeholder="••••••••">
+            <div id="action-buttons" class="flex gap-2">
+                <button onclick="handleLogin()" id="btn-login" class="w-1/2 bg-blue-600 hover:bg-blue-500 py-3 rounded-xl font-semibold transition">Masuk</button>
+                <button onclick="toggleMode(false)" id="btn-goto-signup" class="w-1/2 bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-semibold transition">Daftar Baru</button>
             </div>
 
-            <!-- Opsi Lupa Password (Hanya muncul saat mode Login) -->
-            <div class="flex justify-end text-sm" id="forgot-password-container">
-                <button type="button" id="btn-forgot" class="text-blue-400 hover:underline">Lupa Password?</button>
+            <button onclick="handleSignUp()" id="btn-submit-signup" class="hidden w-full bg-purple-600 hover:bg-purple-500 py-3 rounded-xl font-semibold transition">Daftarkan Akun</button>
+            <button onclick="handleResetPassword()" id="btn-submit-reset" class="hidden w-full bg-yellow-600 hover:bg-yellow-500 py-3 rounded-xl font-semibold text-gray-950 transition">Pulihkan Password</button>
+            
+            <div class="text-center pt-2 space-y-2">
+                <button onclick="toggleMode('forgot')" id="btn-forgot-link" class="block w-full text-sm text-gray-400 hover:underline">Lupa Password?</button>
+                <button onclick="toggleMode(true)" id="btn-back-link" class="hidden text-sm text-blue-400 hover:underline">← Kembali ke Login</button>
             </div>
-
-            <!-- Tombol Submit Utama -->
-            <button type="submit" id="btn-primary" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-blue-500/20">
-                Masuk
-            </button>
-        </form>
-
-        <!-- Footer / Switch Mode -->
-        <div class="mt-6 text-center text-sm text-gray-400">
-            <span id="switch-text">Belum punya akun?</span>
-            <button id="btn-switch" class="text-purple-400 font-semibold ml-1 hover:underline">Daftar Sekarang</button>
         </div>
     </div>
 
-    <!-- Script Logika Interaksi Antarmuka -->
+    <div id="dashboard-section" class="hidden max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-8 bg-gray-900 p-4 rounded-xl border border-gray-800">
+            <div>
+                <p class="text-xs text-gray-400">Akun Aktif:</p>
+                <span id="user-email" class="font-semibold text-blue-400"></span>
+            </div>
+            <button onclick="handleLogout()" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded-xl text-sm font-semibold transition">Keluar</button>
+        </div>
+
+        <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 text-center mb-8">
+            <p class="mb-4 text-gray-300">Pilih foto atau video untuk disimpan di memori browser</p>
+            <input type="file" id="file-chooser" accept="image/*,video/*" class="hidden" onchange="previewFileName()">
+            <label for="file-chooser" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 px-6 py-3 rounded-xl cursor-pointer font-semibold inline-block">
+                + Pilih File
+            </label>
+            <button onclick="uploadFile()" class="ml-2 bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-xl font-semibold transition">Simpan</button>
+            <p id="file-name-preview" class="text-sm mt-3 text-gray-400"></p>
+        </div>
+
+        <h3 class="text-xl font-bold mb-4">Brann Vault - Koleksi Anda</h3>
+        <div id="gallery" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            </div>
+    </div>
+
     <script>
-        const authSubtitle = document.getElementById('auth-subtitle');
-        const btnPrimary = document.getElementById('btn-primary');
-        const btnSwitch = document.getElementById('btn-switch');
-        const switchText = document.getElementById('switch-text');
-        const forgotContainer = document.getElementById('forgot-password-container');
-        
-        let isLoginMode = true;
+        let currentActiveUser = null;
 
-        btnSwitch.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            if (!isLoginMode) {
-                authSubtitle.innerText = "Buat akun baru untuk mulai menyimpan file";
-                btnPrimary.innerText = "Daftar Akun";
-                switchText.innerText = "Sudah punya akun?";
-                btnSwitch.innerText = "Log In";
-                forgotContainer.classList.add('hidden');
-            } else {
-                authSubtitle.innerText = "Masuk untuk mengakses galeri aman Anda";
-                btnPrimary.innerText = "Masuk";
-                switchText.innerText = "Belum punya akun?";
-                btnSwitch.innerText = "Daftar Sekarang";
-                forgotContainer.classList.remove('hidden');
+        // FUNGSI GANTI MODAL TAMPILAN
+        function toggleMode(mode) {
+            const title = document.getElementById('auth-title');
+            const securityBox = document.getElementById('security-box');
+            const actionButtons = document.getElementById('action-buttons');
+            const btnSubmitSignup = document.getElementById('btn-submit-signup');
+            const btnSubmitReset = document.getElementById('btn-submit-reset');
+            const btnForgotLink = document.getElementById('btn-forgot-link');
+            const btnBackLink = document.getElementById('btn-back-link');
+            const passwordInput = document.getElementById('password');
+
+            if (mode === true) { // Ke Mode Login
+                title.innerText = "MASUK KE GALERI";
+                securityBox.classList.add('hidden');
+                actionButtons.classList.remove('hidden');
+                btnSubmitSignup.classList.add('hidden');
+                btnSubmitReset.classList.add('hidden');
+                btnForgotLink.classList.remove('hidden');
+                btnBackLink.classList.add('hidden');
+                passwordInput.classList.remove('hidden');
+            } else if (mode === false) { // Ke Mode Daftar Akun
+                title.innerText = "DAFTAR AKUN BARU";
+                securityBox.classList.remove('hidden');
+                actionButtons.classList.add('hidden');
+                btnSubmitSignup.classList.remove('hidden');
+                btnSubmitReset.classList.add('hidden');
+                btnForgotLink.classList.add('hidden');
+                btnBackLink.classList.remove('hidden');
+                passwordInput.classList.remove('hidden');
+            } else if (mode === 'forgot') { // Ke Mode Lupa Password
+                title.innerText = "PEMULIHAN AKUN";
+                securityBox.classList.remove('hidden');
+                actionButtons.classList.add('hidden');
+                btnSubmitSignup.classList.add('hidden');
+                btnSubmitReset.classList.remove('hidden');
+                btnForgotLink.classList.add('hidden');
+                btnBackLink.classList.remove('hidden');
+                passwordInput.classList.add('hidden'); // Sembunyikan input password
             }
-        });
+        }
 
-        // Trigger Lupa Password
-        document.getElementById('btn-forgot').addEventListener('click', () => {
-            const email = document.getElementById('email').value;
-            if(!email) {
-                alert('Silakan isi kolom email terlebih dahulu untuk mengirim link reset password.');
+        // 1. SISTEM DAFTAR AKUN (SIGN UP)
+        function handleSignUp() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const answer = document.getElementById('security-answer').value.trim().toLowerCase();
+
+            if (!email || !password || !answer) return alert('Semua kolom wajib diisi!');
+
+            // Cek apakah email sudah terdaftar sebelumnya
+            if (localStorage.getItem('user_' + email)) {
+                return alert('Email ini sudah terdaftar! Silakan login.');
+            }
+
+            // Simpan data akun ke dalam LocalStorage
+            const userData = { password: password, securityAnswer: answer };
+            localStorage.setItem('user_' + email, JSON.stringify(userData));
+
+            alert('Pendaftaran berhasil! Silakan masuk.');
+            toggleMode(true);
+        }
+
+        // 2. SISTEM LOGIN KETAT
+        function handleLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            const storedData = localStorage.getItem('user_' + email);
+            if (!storedData) return alert('Akun tidak ditemukan. Silakan daftar dulu!');
+
+            const account = JSON.parse(storedData);
+            if (account.password !== password) {
+                return alert('Password salah! Akses ditolak.');
+            }
+
+            // Jika benar, masuk ke dashboard
+            currentActiveUser = email;
+            masukDashboard();
+        }
+
+        // 3. SISTEM LUPA PASSWORD
+        function handleResetPassword() {
+            const email = document.getElementById('email').value.trim();
+            const answer = document.getElementById('security-answer').value.trim().toLowerCase();
+
+            const storedData = localStorage.getItem('user_' + email);
+            if (!storedData) return alert('Email tidak terdaftar!');
+
+            const account = JSON.parse(storedData);
+            if (account.securityAnswer === answer) {
+                alert(`Jawaban Benar! Password Anda adalah: ${account.password}`);
+                toggleMode(true);
+            } else {
+                alert('Jawaban keamanan salah! Gagal memulihkan password.');
+            }
+        }
+
+        // 4. MASUK KE DASHBOARD
+        function masukDashboard() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            document.getElementById('user-email').innerText = currentActiveUser;
+            tampilkanMedia();
+        }
+
+        // 5. KELUAR (LOGOUT)
+        function handleLogout() {
+            currentActiveUser = null;
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('security-answer').value = '';
+        }
+
+        // Tampilkan info nama file saat dipilih
+        function previewFileName() {
+            const file = document.getElementById('file-chooser').files[0];
+            if (file) document.getElementById('file-name-preview').innerText = "Terpilih: " + file.name;
+        }
+
+        // 6. PROSES SIMPAN FOTO / VIDEO (Ubah Ke Base64)
+        function uploadFile() {
+            const fileInput = document.getElementById('file-chooser');
+            const file = fileInput.files[0];
+            if (!file) return alert('Pilih filenya dulu bray!');
+
+            const reader = new FileReader();
+            reader.onloadend = function () {
+                const base64Data = reader.result;
+                const storageKey = 'gallery_' + currentActiveUser;
+
+                // Ambil data galeri user yang sudah ada atau bikin array baru
+                let userGallery = JSON.parse(localStorage.getItem(storageKey)) || [];
+                userGallery.push({ type: file.type, data: base64Data });
+
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(userGallery));
+                    document.getElementById('file-name-preview').innerText = "";
+                    fileInput.value = ""; // reset input
+                    tampilkanMedia();
+                } catch (e) {
+                    alert('Gagal menyimpan! Ukuran file foto/video terlalu besar untuk memori lokal browser.');
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+
+        // 7. AMBIL & TAMPILKAN GALERI KHUSUS USER YANG LOGIN
+        function tampilkanMedia() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            
+            const storageKey = 'gallery_' + currentActiveUser;
+            const userGallery = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+            if(userGallery.length === 0) {
+                gallery.innerHTML = '<p class="text-gray-500 text-sm col-span-full text-center py-8">Galeri kosong. Mulai upload file pertama Anda!</p>';
                 return;
             }
-            // Di sini nanti dihubungkan ke fungsi Firebase/Supabase resetPassword(email)
-            alert(`Link reset password telah dikirim ke: ${email}`);
-        });
+
+            userGallery.forEach(item => {
+                let mediaElement = '';
+                if (item.type.startsWith('video/')) {
+                    mediaElement = `<video src="${item.data}" controls class="w-full h-48 object-cover rounded-xl border border-gray-800 bg-black"></video>`;
+                } else {
+                    mediaElement = `<img src="${item.data}" class="w-full h-48 object-cover rounded-xl border border-gray-800 shadow-md">`;
+                }
+                gallery.innerHTML += mediaElement;
+            });
+        }
     </script>
 </body>
 </html>
